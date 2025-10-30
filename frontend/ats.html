@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockhire - ATS Resume Check</title>
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body class="bg-gradient">
+  <div class="container">
+    <div class="card ats-card">
+      <h1>ATS Resume Check</h1>
+      <p class="subtitle">Upload your resume (PDF)</p>
+      <form id="resumeForm">
+        <input type="file" id="resumeFile" accept=".pdf">
+        <button type="submit" class="btn-primary">Check Resume</button>
+      </form>
+      <p id="validationResult" class="subtitle"></p>
+    </div>
+  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="js/ats.js" type="module"></script>
+
+
+
+</body>
+</html>
