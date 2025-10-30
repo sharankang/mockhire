@@ -8,7 +8,7 @@ if (!getToken()) {
 }
 
 let jdContext = "";
-let chatHistory = []; 
+let chatHistory = [];
 let questionCount = 0;
 let maxQuestions = 5;
 
@@ -33,7 +33,10 @@ jdForm.addEventListener("submit", async (e) => {
     alert("Please upload or paste a job description first.");
     return;
   }
-
+  const jdSubtitle = document.getElementById("jdSubtitle");
+  if (jdSubtitle) {
+      jdSubtitle.style.display = "none"; 
+  }
   jdForm.style.display = "none";
   chatContainer.style.display = "block";
   startSimulation();
@@ -41,6 +44,9 @@ jdForm.addEventListener("submit", async (e) => {
 
 function startSimulation() {
   const firstQuestion = "Let's start your interview! First question: <em>Tell me about yourself.</em>";
+
+  chatBox.innerHTML = ""; 
+  
   appendMessage("AI", firstQuestion);
   chatHistory.push({ role: "AI", content: firstQuestion });
 }
@@ -50,14 +56,16 @@ sendBtn.addEventListener("click", async () => {
   if (!answer) return;
 
   appendMessage("You", answer);
+  
   chatHistory.push({ role: "You", content: answer });
+  
   userAnswerInput.value = "";
   sendBtn.disabled = true;
 
   questionCount++;
 
   if (questionCount >= maxQuestions) {
-    await giveFinalFeedback(answer);
+    await giveFinalFeedback();
     return;
   }
 
@@ -78,11 +86,17 @@ sendBtn.addEventListener("click", async () => {
     if (!res.ok) throw new Error("API Error");
 
     const data = await res.json();
+
+    chatBox.innerHTML = ""; 
+
     appendMessage("AI", data.question);
+
     chatHistory.push({ role: "AI", content: data.question });
 
   } catch (err) {
     console.error("Error:", err);
+
+    chatBox.innerHTML = "";
     appendMessage("AI", "Sorry, I had trouble generating the next question.");
   }
 
@@ -92,29 +106,32 @@ sendBtn.addEventListener("click", async () => {
 
 async function giveFinalFeedback() {
   appendMessage("AI", "Great job! That's the end of the simulation. Generating your feedback...");
-  chatContainer.style.display = "none";
-  finalScoreEl.style.display = "block";
-  finalScoreEl.textContent = "Generating feedback...";
 
-  try {
-    const res = await fetch("http://localhost:5000/api/ai/interview/feedback", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${getToken()}`
-      },
-      body: JSON.stringify({ jdContext, chatHistory })
-    });
+  setTimeout(async () => {
+    chatContainer.style.display = "none";
+    finalScoreEl.style.display = "block";
+    finalScoreEl.textContent = "Generating feedback...";
 
-    if (!res.ok) throw new Error("API Error");
+    try {
+      const res = await fetch("http://localhost:5000/api/ai/interview/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({ jdContext, chatHistory })
+      });
 
-    const data = await res.json();
-    finalScoreEl.innerHTML = marked.parse(data.feedback);
+      if (!res.ok) throw new Error("API Error");
 
-  } catch (err) {
-    console.error("Error:", err);
-    finalScoreEl.textContent = "Error generating feedback.";
-  }
+      const data = await res.json();
+      finalScoreEl.innerHTML = marked.parse(data.feedback);
+
+    } catch (err) {
+      console.error("Error:", err);
+      finalScoreEl.textContent = "Error generating feedback.";
+    }
+  }, 2000);
 }
 
 function appendMessage(sender, text) {

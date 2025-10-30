@@ -18,6 +18,9 @@ document.getElementById("jdForm").addEventListener("submit", async function (e) 
   let jdText = document.getElementById("jdText").value.trim();
   const resultEl = document.getElementById("result");
 
+  const form = document.getElementById("jdForm");
+  const subtitle = document.getElementById("jdSubtitle");
+
   if (file) {
     resultEl.textContent = "Reading JD PDF...";
     jdText = await extractTextFromPDF(file);
@@ -29,13 +32,17 @@ document.getElementById("jdForm").addEventListener("submit", async function (e) 
   }
 
   const resumeText = localStorage.getItem("resumeText");
-  if (!resumeText) {
+  if (!resumeText && !resumeId) {
     resultEl.textContent = "Resume not found. Please upload resume again.";
     return;
   }
 
+  if (form) form.style.display = "none";
+  if (subtitle) subtitle.style.display = "none";
+
   resultEl.textContent = "Evaluating with AI...";
-try {
+  
+  try {
     const res = await fetch("http://localhost:5000/api/ai/evaluate", {
       method: "POST",
       headers: {
@@ -46,15 +53,14 @@ try {
     });
 
     if (!res.ok) throw new Error("Evaluation failed");
-
+    
     const data = await res.json();
     resultEl.innerHTML = marked.parse(data.markdown);
   } catch (err) {
-    console.error("Error:", err);
+    console.error("Gemini error:", err);
     resultEl.textContent = "Error evaluating resume.";
   }
 });
-
 async function extractTextFromPDF(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
