@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockhire - Job Description</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body class="bg-gradient">
+  <div class="container">
+    <div class="card ats-card">
+      <h1>Upload Job Description</h1>
+      <p class="subtitle">PDF or paste text below</p>
+      <form id="jdForm">
+        <input type="file" id="jdFile" accept=".pdf"><br>OR<br>
+        <textarea id="jdText" rows="12" placeholder="Paste JD here"></textarea>
+        <button type="submit" class="btn-primary">Evaluate Resume</button>
+      </form>
+      <div id="result" class="subtitle"></div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="js/jd.js" type="module"></script>
+</body>
+</html>
