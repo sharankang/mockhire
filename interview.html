@@ -19,15 +19,28 @@
         <button type="submit" class="btn-primary">Start Simulation</button>
       </form>
 
+      <div id="interviewChoice" style="display:none; text-align: center;">
+        <h2 class="subtitle">How do you want to practice?</h2>
+        <button id="startTextBtn" class="btn-primary" style="margin: 5px;">Text Interview</button>
+        <button id="startVideoBtn" class="btn-primary" style="margin: 5px;">Video Interview</button>
+      </div>
+
       <div id="chat-container" style="display:none;">
         <div id="chat-box" class="subtitle"></div>
         <textarea id="userAnswer" rows="3" placeholder="Type your response here..."></textarea>
         <button id="sendAnswer" class="btn-primary">Send</button>
       </div>
 
-      <div id="finalScore" class="subtitle"></div>
+      <div id="videoContainer" style="display:none; text-align: center;">
+        <p class_="subtitle" id="videoStatus">Getting ready...</p>
+        <video id="userVideo" autoplay muted playsinline></video>
+        <div id="aiQuestionText" class="subtitle" style="font-weight: 600; margin-top: 15px;"></div>
+      </div>
+
+      <div id="finalScore" class="subtitle" style="display:none;"></div>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="js/interview.js" type="module"></script>

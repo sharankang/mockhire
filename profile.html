@@ -11,8 +11,18 @@
 <body class="bg-gradient">
   <div class="container">
     <div class="card ats-card">
-      <h1>Your Uploaded Resumes</h1>
+      <h1>Your Profile</h1>
       <div id="resumeList" class="subtitle">Loading...</div>
+      <hr style="margin: 30px 0;">
+      <h2>Past Simulations</h2>
+      <div id="simulationList" class="subtitle">Loading...</div>
+    </div>
+  </div>
+  <div id="viewModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2 id="modalTitle">Details</h2>
+      <div id="modalBody">Loading...</div>
     </div>
   </div>
   <div id="resumeModal" class="modal">
@@ -22,6 +32,7 @@
       <pre id="modalResumeText">Loading...</pre>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="js/profile.js" type="module"></script>
 </body>
 </html>
