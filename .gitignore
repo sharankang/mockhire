@@ -1,0 +1,12 @@
+# Backend dependencies
+backend/node_modules
+
+# Frontend dependencies
+frontend/node_modules
+
+# Environment file with all your secrets
+backend/.env
+
+# Windows system files
+.DS_Store
+Thumbs.db

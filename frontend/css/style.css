@@ -382,8 +382,8 @@ ul {
 }
 
 
-/* yo */
-/* --- Modal Styles --- */
+
+/* Modal Styles */
 .modal {
   display: none; 
   position: fixed;
@@ -423,20 +423,26 @@ ul {
   cursor: pointer;
 }
 
-#modalResumeText {
+
+#modalBody {
+  max-height: 60vh;
+  overflow-y: auto;
   background: #f9f7f6;
   border-radius: 8px;
   padding: 15px;
+  border: 1px solid #eee;
+}
+
+
+#modalBody pre {
   font-size: 16px;
   color: #415E72;
   white-space: pre-wrap;
   word-wrap: break-word;
-  max-height: 60vh;
-  overflow-y: auto;
-  border: 1px solid #eee;
+  margin: 0; 
 }
 
-/* --- New View Button Style --- */
+/*New View Button Style*/
 .view-btn {
   background: #415E72;
   color: #fff;
@@ -450,4 +456,37 @@ ul {
 
 .view-btn:hover {
   background: #2c4656;
+}
+
+/*Interview Simulation Text Box*/
+#userAnswer {
+  min-height: 200px;
+  resize: vertical;
+}
+
+
+/*Video Interview Styles*/
+#videoContainer {
+  width: 100%;
+}
+
+#userVideo {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 12px;
+  background: #eee;
+  /* Flip the camera to be a "mirror" */
+  transform: scaleX(-1);
+}
+
+#aiQuestionText {
+  min-height: 50px;
+  font-size: 20px;
+}
+
+#videoStatus {
+  font-size: 16px;
+  color: #415E72;
+  margin-bottom: 10px;
 }

@@ -1,5 +1,16 @@
 const mongoose = require("mongoose");
 
+const SimulationSchema = new mongoose.Schema({
+  date: { type: Date, default: Date.now },
+  chatHistory: [
+    {
+      role: String,
+      content: String
+    }
+  ],
+  feedback: { type: String, required: true }
+});
+
 const ResumeSchema = new mongoose.Schema({
   filename: { type: String, required: true },
   date: { type: Date, default: Date.now },
@@ -17,7 +28,8 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  resumes: [ResumeSchema]
+  resumes: [ResumeSchema],
+  simulations: [SimulationSchema]
 });
 
 module.exports = mongoose.model("User", UserSchema);
