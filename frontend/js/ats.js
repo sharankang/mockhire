@@ -51,7 +51,7 @@ document.getElementById("resumeForm").addEventListener("submit", async function(
   try {
     resultEl.textContent = "Valid resume. Uploading to profile...";
     
-    const res = await fetch("http://localhost:5000/api/resumes/upload", {
+    const res = await fetch("https://mockhire-backend.onrender.com/api/resumes/upload", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

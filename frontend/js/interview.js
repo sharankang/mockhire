@@ -1,4 +1,3 @@
-// --- Helper function & Auth (No change) ---
 function getToken() {
   return localStorage.getItem("mockhireToken");
 }
@@ -8,14 +7,12 @@ if (!getToken()) {
   window.location.href = "login.html";
 }
 
-// --- Global Variables ---
 let jdContext = "";
-let chatHistory = []; // Always stores the full transcript for the backend
+let chatHistory = [];
 let questionCount = 0;
-let maxQuestions = 1;
-let videoStream = null; // To hold the user's camera stream
+let maxQuestions = 4;
+let videoStream = null;
 
-// --- NEW: Speech API Setup ---
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const synthesis = window.speechSynthesis;
 let recognition = null;
@@ -25,40 +22,34 @@ if (!SpeechRecognition) {
   console.warn("Speech recognition not supported by this browser.");
 } else {
   recognition = new SpeechRecognition();
-  recognition.continuous = false; // Stop listening after one phrase
-  recognition.interimResults = false; // Get final result
+  recognition.continuous = false;
+  recognition.interimResults = false;
 }
 
 if (!synthesis) {
   console.warn("Speech synthesis not supported by this browser.");
 }
 
-// --- Get All DOM Elements ---
 const jdForm = document.getElementById("jdForm");
 const jdSubtitle = document.getElementById("jdSubtitle");
 
-// Interview Choice
 const interviewChoice = document.getElementById("interviewChoice");
 const startTextBtn = document.getElementById("startTextBtn");
 const startVideoBtn = document.getElementById("startVideoBtn");
 
-// Text Chat
 const chatContainer = document.getElementById("chat-container");
 const chatBox = document.getElementById("chat-box");
 const userAnswerInput = document.getElementById("userAnswer");
 const sendBtn = document.getElementById("sendAnswer");
 
-// Video Chat
 const videoContainer = document.getElementById("videoContainer");
 const videoStatus = document.getElementById("videoStatus");
 const userVideo = document.getElementById("userVideo");
 const aiQuestionText = document.getElementById("aiQuestionText");
 
-// Final Score
 const finalScoreEl = document.getElementById("finalScore");
 
 
-// --- 1. JD Form Submission (UPDATED) ---
 jdForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const file = document.getElementById("jdFile").files[0];
@@ -74,13 +65,11 @@ jdForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Hide the form and show the choice buttons
   jdSubtitle.style.display = "none";
   jdForm.style.display = "none";
   interviewChoice.style.display = "block";
 });
 
-// --- 2. Start Interview (Choice Buttons) ---
 startTextBtn.addEventListener("click", () => {
   interviewChoice.style.display = "none";
   chatContainer.style.display = "block";
@@ -98,7 +87,6 @@ startVideoBtn.addEventListener("click", () => {
 });
 
 
-// --- 3. TEXT SIMULATION (No major changes) ---
 function startTextSimulation() {
   const firstQuestion = "Let's start your interview! First question: <em>Tell me about yourself.</em>";
   chatBox.innerHTML = "";
@@ -118,7 +106,7 @@ sendBtn.addEventListener("click", async () => {
   questionCount++;
 
   if (questionCount >= maxQuestions) {
-    await giveFinalFeedback(); // This is the shared feedback function
+    await giveFinalFeedback();
     return;
   }
 
@@ -136,23 +124,20 @@ sendBtn.addEventListener("click", async () => {
 });
 
 
-// --- 4. NEW: VIDEO SIMULATION ---
 async function startVideoSimulation() {
   videoContainer.style.display = "block";
   videoStatus.textContent = "Requesting camera access...";
   
   try {
-    // Get camera and mic
     videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     userVideo.srcObject = videoStream;
-    userVideo.play(); // Ensure video plays
+    userVideo.play();
   } catch (err) {
     console.error("Camera access denied:", err);
     videoStatus.textContent = "Camera access denied. Please refresh and allow access.";
     return;
   }
   
-  // Setup Speech Recognition Listeners
   recognition.onresult = (event) => {
     const answer = event.results[0][0].transcript;
     console.log("User said:", answer);
@@ -163,8 +148,8 @@ async function startVideoSimulation() {
   
   recognition.onend = () => {
     if (isListening) {
-      // User just stopped talking, but maybe not on purpose
-      // You could restart it, but for a simple case, we'll just stop
+      // User just stopped talking, but maybe they're gonna continue?
+      // Could restart it, but let's just stop for now
       isListening = false;
       videoStatus.textContent = "Stopped listening.";
     }
@@ -176,7 +161,6 @@ async function startVideoSimulation() {
     videoStatus.textContent = "Error listening. Please try again.";
   };
 
-  // Start the interview
   const firstQuestion = "Let's start your interview! First question: Tell me about yourself.";
   chatHistory.push({ role: "AI", content: firstQuestion });
   askVideoQuestion(firstQuestion);
@@ -186,10 +170,8 @@ function askVideoQuestion(questionText) {
   aiQuestionText.textContent = questionText;
   videoStatus.textContent = "AI is asking a question...";
   
-  // Speak the question
   const utterance = new SpeechSynthesisUtterance(questionText);
   
-  // When the AI finishes speaking, start listening
   utterance.onend = () => {
     videoStatus.textContent = "Listening for your answer...";
     isListening = true;
@@ -201,37 +183,30 @@ function askVideoQuestion(questionText) {
 
 async function handleVideoAnswer(answer) {
   videoStatus.textContent = "AI is thinking...";
-  aiQuestionText.textContent = `You said: "${answer}"`; // Show user what was heard
-  
-  // Log answer
+  aiQuestionText.textContent = `You said: "${answer}"`; 
   chatHistory.push({ role: "You", content: answer });
   questionCount++;
 
   if (questionCount >= maxQuestions) {
-    await giveFinalFeedback(); // Call shared feedback function
+    await giveFinalFeedback();
     return;
   }
   
-  // Get next question
   try {
     const nextQuestion = await getNextAiQuestion(answer);
     chatHistory.push({ role: "AI", content: nextQuestion });
     
-    // Wait a moment before asking
     setTimeout(() => {
       askVideoQuestion(nextQuestion);
-    }, 1500); // 1.5 second pause
+    }, 1500);
 
   } catch (err) {
     askVideoQuestion("Sorry, I had an error. Let's try that again.");
   }
 }
 
-// --- 5. SHARED BACKEND LOGIC ---
-
-// NEW: Refactored network call
 async function getNextAiQuestion(lastAnswer) {
-  const res = await fetch("http://localhost:5000/api/ai/interview/next", {
+  const res = await fetch("https://mockhire-backend.onrender.com/api/ai/interview/next", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -249,12 +224,10 @@ async function getNextAiQuestion(lastAnswer) {
   }
   
   const data = await res.json();
-  return data.question; // Returns the next question string
+  return data.question;
 }
 
-// UPDATED: This function is now shared by both modes
 async function giveFinalFeedback() {
-  // Stop all media
   if (videoStream) {
     videoStream.getTracks().forEach(track => track.stop());
     userVideo.srcObject = null;
@@ -262,21 +235,18 @@ async function giveFinalFeedback() {
   if (isListening) {
     recognition.stop();
   }
-  synthesis.cancel(); // Stop any speaking
+  synthesis.cancel(); 
 
-  // Hide all interview UI
   chatContainer.style.display = "none";
   videoContainer.style.display = "none";
   
-  // Show and populate final score
   finalScoreEl.style.display = "block";
   finalScoreEl.textContent = "Generating feedback...";
   
   let feedbackMarkdown = ""; 
 
   try {
-    // 1. Get feedback from the AI
-    const res = await fetch("http://localhost:5000/api/ai/interview/feedback", {
+    const res = await fetch("https://mockhire-backend.onrender.com/api/ai/interview/feedback", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -291,7 +261,6 @@ async function giveFinalFeedback() {
     feedbackMarkdown = data.feedback; 
     finalScoreEl.innerHTML = marked.parse(feedbackMarkdown);
 
-    // NEW: Speak a summary of the feedback
     const feedbackSummary = "Great job, your feedback is ready. You can review the full report on screen.";
     const utterance = new SpeechSynthesisUtterance(feedbackSummary);
     synthesis.speak(utterance);
@@ -302,9 +271,8 @@ async function giveFinalFeedback() {
     return;
   }
 
-  // 2. Save the simulation (shared)
   try {
-    await fetch("http://localhost:5000/api/simulations/save", {
+    await fetch("https://mockhire-backend.onrender.com/api/simulations/save", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -321,7 +289,6 @@ async function giveFinalFeedback() {
   }
 }
 
-// --- SHARED HELPER FUNCTIONS (No change) ---
 function appendMessage(sender, text) {
   const msg = document.createElement("div");
   msg.classList.add("chat-message");

@@ -4,7 +4,7 @@ backend/node_modules
 # Frontend dependencies
 frontend/node_modules
 
-# Environment file with all your secrets
+# Environment file
 backend/.env
 
 # Windows system files
