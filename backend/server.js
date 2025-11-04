@@ -5,6 +5,10 @@ const cors = require("cors");
 
 const app = express();
 
+const corsOptions = {
+  origin: "https://sharankang.github.io"
+};
+
 //Middleware
 app.use(cors());
 app.use(express.json());
