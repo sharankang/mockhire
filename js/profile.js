@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   try {
-    const res = await fetch("http://localhost:5000/api/resumes", {
+    const res = await fetch("https://mockhire-backend.onrender.com/api/resumes", {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (!res.ok) throw new Error("Could not fetch resumes");
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   
 
   try {
-    const res = await fetch("http://localhost:5000/api/simulations", {
+    const res = await fetch("https://mockhire-backend.onrender.com/api/simulations", {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (!res.ok) throw new Error("Could not fetch simulations");
@@ -160,7 +160,7 @@ function showSimulationModal(sim) {
 
 async function deleteResume(id) {
   try {
-    const res = await fetch(`http://localhost:5000/api/resumes/${id}`, {
+    const res = await fetch(`https://mockhire-backend.onrender.com/api/resumes/${id}`, {
       method: "DELETE",
       headers: { "Authorization": `Bearer ${getToken()}` }
     });

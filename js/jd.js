@@ -43,7 +43,7 @@ document.getElementById("jdForm").addEventListener("submit", async function (e) 
   resultEl.textContent = "Evaluating with AI...";
   
   try {
-    const res = await fetch("http://localhost:5000/api/ai/evaluate", {
+    const res = await fetch("https://mockhire-backend.onrender.com/api/ai/evaluate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
