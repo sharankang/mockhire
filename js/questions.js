@@ -14,7 +14,7 @@ document.getElementById("questionForm").addEventListener("submit", async functio
   const resultEl = document.getElementById("result");
 
   if (file) {
-    resultEl.textContent = "📄 Reading JD PDF...";
+    resultEl.textContent = "Reading JD PDF...";
     jdText = await extractTextFromPDF(file);
   }
 
@@ -26,7 +26,7 @@ document.getElementById("questionForm").addEventListener("submit", async functio
   resultEl.textContent = "Generating questions with AI...";
 
   try {
-    const res = await fetch("http://localhost:5000/api/ai/questions", {
+    const res = await fetch("https://mockhire-backend.onrender.com/api/ai/questions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
