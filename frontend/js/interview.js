@@ -18,12 +18,17 @@ const synthesis = window.speechSynthesis;
 let recognition = null;
 let isListening = false;
 
+let silenceTimer = null;
+let finalTranscript = ""; 
+
 if (!SpeechRecognition) {
   console.warn("Speech recognition not supported by this browser.");
 } else {
   recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = false;
+  //Set to true so it doesn't stop automatically after one sentence
+  recognition.continuous = true; 
+  //Set to true to show what the AI hears in real-time
+  recognition.interimResults = true; 
 }
 
 if (!synthesis) {
@@ -139,26 +144,49 @@ async function startVideoSimulation() {
   }
   
   recognition.onresult = (event) => {
-    const answer = event.results[0][0].transcript;
-    console.log("User said:", answer);
-    isListening = false;
-    recognition.stop();
-    handleVideoAnswer(answer);
+    //Clear the existing timer because the user is still talking
+    clearTimeout(silenceTimer);
+
+    let interimTranscript = "";
+    let currentBatchFinal = "";
+
+    // Build the transcript string from the event results
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        currentBatchFinal += event.results[i][0].transcript + " ";
+      } else {
+        interimTranscript += event.results[i][0].transcript;
+      }
+    }
+    
+    // Accumulate the final text
+    finalTranscript += currentBatchFinal;
+
+    // We show the accumulated final text + what they are currently saying
+    aiQuestionText.textContent = `Listening: "${finalTranscript + interimTranscript}"`;
+
+    silenceTimer = setTimeout(() => {
+      if ((finalTranscript + interimTranscript).trim().length > 0) {
+        recognition.stop();
+        isListening = false;
+        handleVideoAnswer((finalTranscript + interimTranscript).trim());
+      }
+    }, 3000); //Wait 3 seconds
   };
   
   recognition.onend = () => {
     if (isListening) {
-      // User just stopped talking, but maybe they're gonna continue?
-      // Could restart it, but let's just stop for now
-      isListening = false;
-      videoStatus.textContent = "Stopped listening.";
+      videoStatus.textContent = "Microphone stopped.";
     }
   };
   
   recognition.onerror = (event) => {
     console.error("Speech recognition error:", event.error);
-    isListening = false;
-    videoStatus.textContent = "Error listening. Please try again.";
+    clearTimeout(silenceTimer);
+    if (event.error !== 'no-speech') {
+      isListening = false;
+      videoStatus.textContent = "Error listening. Please try again.";
+    }
   };
 
   const firstQuestion = "Let's start your interview! First question: Tell me about yourself.";
@@ -175,6 +203,10 @@ function askVideoQuestion(questionText) {
   utterance.onend = () => {
     videoStatus.textContent = "Listening for your answer...";
     isListening = true;
+    
+    finalTranscript = ""; 
+    clearTimeout(silenceTimer);
+    
     recognition.start();
   };
   
