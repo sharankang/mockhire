@@ -10,7 +10,7 @@ if (!getToken()) {
 let jdContext = "";
 let chatHistory = [];
 let questionCount = 0;
-let maxQuestions = 4;
+let maxQuestions = 1;
 let videoStream = null;
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -144,7 +144,7 @@ async function startVideoSimulation() {
   }
   
   recognition.onresult = (event) => {
-    //Clear the existing timer because the user is still talking
+    //Clear the existing timer (the user is still talking)
     clearTimeout(silenceTimer);
 
     let interimTranscript = "";
@@ -324,6 +324,11 @@ async function giveFinalFeedback() {
 function appendMessage(sender, text) {
   const msg = document.createElement("div");
   msg.classList.add("chat-message");
+  if (sender === "AI") {
+    msg.classList.add("ai-message");
+  } else {
+    msg.classList.add("user-message");
+  }
   msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;

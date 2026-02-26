@@ -71,10 +71,14 @@ function renderResumes(resumes, listEl) {
   resumes.forEach((resume) => {
     const li = document.createElement("li");
     li.innerHTML = `
-      <strong>${resume.filename}</strong> 
-      <small>(${new Date(resume.date).toLocaleString()})</small>
-      <button data-id="${resume._id}" class="view-btn view-resume">View</button>
-      <button data-id="${resume._id}" class="delete-btn delete-resume">Delete</button>
+      <div class="profile-file-info">
+        <strong>${resume.filename}</strong>
+        <small>${new Date(resume.date).toLocaleString()}</small>
+      </div>
+      <div class="profile-actions">
+        <button data-id="${resume._id}" class="view-btn view-resume">View</button>
+        <button data-id="${resume._id}" class="delete-btn delete-resume">Delete</button>
+      </div>
     `;
     ul.appendChild(li);
   });
@@ -109,9 +113,13 @@ function renderSimulations(simulations, listEl) {
     const li = document.createElement("li");
     const simDate = new Date(sim.date).toLocaleString();
     li.innerHTML = `
-      <strong>Simulation</strong> 
-      <small>(${simDate})</small>
-      <button data-id="${sim._id}" class="view-btn view-simulation">View</button>
+      <div class="profile-file-info">
+        <strong>Interview Simulation</strong>
+        <small>${simDate}</small>
+      </div>
+      <div class="profile-actions">
+        <button data-id="${sim._id}" class="view-btn view-simulation">View</button>
+      </div>
     `;
     ul.appendChild(li);
   });
