@@ -6,7 +6,7 @@ const User = require("../models/user.model");
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 
 router.use(authMiddleware);
@@ -51,14 +51,53 @@ router.post("/evaluate", async (req, res) => {
     const resumeText = resume.text;
 
     const prompt = `
-    You are an ATS evaluator. Compare this resume against this job description.
-    Provide feedback in markdown... (rest of your prompt from jd.js)
+You are a strict ATS (Applicant Tracking System) evaluator. Compare the resume against the job description and return your evaluation in EXACTLY the following markdown format. Do not deviate from this structure.
 
-    Resume:
-    ${resumeText}
+---
 
-    Job description:
-    ${jdText}
+## ATS Evaluation: [Candidate Name] vs. [Job Title]
+
+**Overall ATS Score: [X]/100**
+
+[One short paragraph summarizing the overall match.]
+
+---
+
+## Strengths
+- [Strength 1]
+- [Strength 2]
+- [Strength 3]
+
+## Areas for Improvement
+- [Gap 1]
+- [Gap 2]
+- [Gap 3]
+
+## Keyword & Skill Alignment
+
+| Skill/Keyword | Job Description Match | Resume Presence | Score | Notes |
+|---|---|---|---|---|
+| [Skill 1] | High/Medium/Low | High/Medium/Low/Missing | [X]/5 | [Brief note] |
+| [Skill 2] | High/Medium/Low | High/Medium/Low/Missing | [X]/5 | [Brief note] |
+
+## Recommendations
+- [Specific actionable suggestion 1]
+- [Specific actionable suggestion 2]
+- [Specific actionable suggestion 3]
+
+---
+
+STRICT RULES:
+- The Overall ATS Score MUST always be out of 100. Never use /5, /10, percentages, or vague labels like "high match".
+- Each row in the Keyword table MUST have a score out of 5.
+- Always use the exact section headers shown above.
+- Be specific and honest. Do not pad the evaluation.
+
+Resume:
+${resumeText}
+
+Job Description:
+${jdText}
     `;
 
     const result = await model.generateContent(prompt);
