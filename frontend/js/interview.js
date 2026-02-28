@@ -10,7 +10,7 @@ if (!getToken()) {
 let jdContext = "";
 let chatHistory = [];
 let questionCount = 0;
-let maxQuestions = 1;
+let maxQuestions = 2;
 let videoStream = null;
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
