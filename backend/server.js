@@ -25,6 +25,12 @@ app.use("/api/resumes", require("./routes/resume.routes"));
 app.use("/api/ai", require("./routes/ai.routes"));
 app.use("/api/simulations", require("./routes/simulation.routes"));
 
+// Health check 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", uptime: process.uptime() });
+});
+
+
 //Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
