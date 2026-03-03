@@ -1,11 +1,8 @@
 async function validateDocument(text, expectedType) {
   const token = localStorage.getItem("mockhireToken");
-
   if (!text || text.trim().length < 100) {
     return { valid: false, error: "⚠️ The uploaded file appears to be empty or too short." };
   }
-
-  // Quick prompt injection check
   const injectionPatterns = [
     /ignore (all |previous |above |prior )?instructions/i,
     /disregard (all |previous |above |prior )?instructions/i,
@@ -17,11 +14,9 @@ async function validateDocument(text, expectedType) {
   ];
   for (const pattern of injectionPatterns) {
     if (pattern.test(text)) {
-      return { valid: false, error: "⚠️ Invalid document content detected. Please upload a real document!" };
+      return { valid: false, error: "⚠️ Invalid document content detected. Please upload a real document." };
     }
   }
-
-  // Call backend AI classifier
   try {
     const res = await fetch("https://mockhire-backend.onrender.com/api/ai/validate", {
       method: "POST",

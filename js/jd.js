@@ -27,13 +27,19 @@ document.getElementById("jdForm").addEventListener("submit", async function (e) 
   }
 
   if (!jdText) {
-    resultEl.textContent = "Please upload JD PDF or paste text.";
+    resultEl.innerHTML = "⚠️ Please upload a JD PDF or paste text.";
+    return;
+  }
+
+  const { valid: jdValid, error: jdError } = await validateDocument(jdText, "jd");
+  if (!jdValid) {
+    resultEl.innerHTML = jdError;
     return;
   }
 
   const resumeText = localStorage.getItem("resumeText");
   if (!resumeText && !resumeId) {
-    resultEl.textContent = "Resume not found. Please upload resume again.";
+    resultEl.innerHTML = "⚠️ Resume not found. Please upload your resume again.";
     return;
   }
 

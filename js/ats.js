@@ -29,24 +29,12 @@ document.getElementById("resumeForm").addEventListener("submit", async function(
     return;
   }
 
-  const lowerCaseText = text.toLowerCase();
-  
-  const educationKeywords = ['education', 'university', 'college', 'school'];
-  const experienceKeywords = ['experience', 'work history', 'projects', 'employment'];
-  const skillsKeywords = ['skills', 'proficiencies', 'technical skills', 'tools'];
-  
-  const hasEducation = educationKeywords.some(keyword => lowerCaseText.includes(keyword));
-  const hasExperience = experienceKeywords.some(keyword => lowerCaseText.includes(keyword));
-  const hasSkills = skillsKeywords.some(keyword => lowerCaseText.includes(keyword));
-  
-  const validationScore = (hasEducation ? 1 : 0) + (hasExperience ? 1 : 0) + (hasSkills ? 1 : 0);
-  
-  if (validationScore < 2) {
-    resultEl.innerHTML = "Error: This file does not appear to be a valid resume. Please upload a file containing sections like 'Education', 'Experience', or 'Skills'.<br><strong>(Don't have a resume? Try our Resume Templates feature!)</strong>";
+  const { valid, error } = await validateDocument(text, "resume");
+  if (!valid) {
+    resultEl.innerHTML = error;
     button.disabled = false;
     return;
   }
-
 
   try {
     resultEl.textContent = "Valid resume. Uploading to profile...";
@@ -80,7 +68,6 @@ async function extractTextFromPDF(file) {
     reader.onload = async function() {
       try {
         const typedarray = new Uint8Array(this.result);
-        // to make sure pdfjsLib is loaded
         if (typeof pdfjsLib === 'undefined') {
           console.error("pdf.js library is not loaded.");
           resolve(null);
