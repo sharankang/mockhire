@@ -19,7 +19,13 @@ document.getElementById("questionForm").addEventListener("submit", async functio
   }
 
   if (!jdText) {
-    resultEl.textContent = "Please upload JD PDF or paste text!";
+    resultEl.innerHTML = "⚠️ Please upload a JD PDF or paste text.";
+    return;
+  }
+
+  const { valid: jdValid, error: jdError } = await validateDocument(jdText, "jd");
+  if (!jdValid) {
+    resultEl.innerHTML = jdError;
     return;
   }
 

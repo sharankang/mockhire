@@ -8,9 +8,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 router.use(authMiddleware);
-
-
-// ── Input sanitization ──────────────────────────────────────────────────────
 function sanitizeInput(text) {
   if (!text || typeof text !== "string") return "";
 
@@ -35,13 +32,8 @@ function sanitizeInput(text) {
 
   return cleaned.slice(0, 8000);
 }
-
-
-// ── AI document classifier ──────────────────────────────────────────────────
-// Uses Gemini itself to classify whether a document is a resume, JD, or neither.
-// Returns: { type: "resume" | "jd" | "invalid", reason: string }
 async function classifyDocument(text, expectedType) {
-  const snippet = text.slice(0, 2000); // Send only first 2000 chars for speed
+  const snippet = text.slice(0, 2000);
 
   const prompt = `
 You are a document classifier. Your ONLY job is to classify the document below.
@@ -62,20 +54,14 @@ Respond with ONLY a JSON object in this exact format, nothing else:
   try {
     const result = await model.generateContent(prompt);
     const raw = (await result.response.text()).trim();
-    // Strip markdown code fences if present
     const cleaned = raw.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(cleaned);
     return parsed;
   } catch (err) {
     console.error("Document classification error:", err);
-    // Fail open — if classification itself fails, don't block the user
     return { type: expectedType, reason: "Classification unavailable" };
   }
 }
-
-
-// ── POST /api/ai/validate ───────────────────────────────────────────────────
-// Frontend calls this before any AI feature to validate document type
 router.post("/validate", async (req, res) => {
   const { text, expectedType } = req.body;
 
@@ -103,9 +89,6 @@ router.post("/validate", async (req, res) => {
     return res.json({ valid: false, reason });
   }
 });
-
-
-// ── POST /api/ai/questions ─────────────────────────────────────────────────
 router.post("/questions", async (req, res) => {
   let { jdText } = req.body;
   if (!jdText) return res.status(400).json({ msg: "Job description text is required." });
@@ -137,9 +120,6 @@ Do not include any commentary outside the questions.
     res.status(500).json({ msg: "Error generating questions." });
   }
 });
-
-
-// ── POST /api/ai/evaluate ──────────────────────────────────────────────────
 router.post("/evaluate", async (req, res) => {
   let { jdText, resumeId } = req.body;
   if (!jdText) return res.status(400).json({ msg: "Job description text is required." });
@@ -201,9 +181,6 @@ STRICT RULES:
     res.status(500).json({ msg: "Error evaluating resume." });
   }
 });
-
-
-// ── POST /api/ai/interview/next ────────────────────────────────────────────
 router.post("/interview/next", async (req, res) => {
   let { jdContext, chatHistory, lastAnswer } = req.body;
 
@@ -243,9 +220,6 @@ Output only the question text, nothing else.
     res.status(500).json({ msg: "Sorry, I had trouble generating the next question." });
   }
 });
-
-
-// ── POST /api/ai/interview/feedback ───────────────────────────────────────
 router.post("/interview/feedback", async (req, res) => {
   let { jdContext, chatHistory } = req.body;
 
@@ -296,6 +270,5 @@ STRICT RULES:
     res.status(500).json({ msg: "Error generating feedback." });
   }
 });
-
 
 module.exports = router;
